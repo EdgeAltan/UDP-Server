@@ -49,7 +49,6 @@
 UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -135,21 +134,21 @@ int main(void)
 
 void udpServer_init(void)
 {
-	// UDP Control Block structure
+   // UDP Control Block structure
    struct udp_pcb *upcb;
    err_t err;
 
-   /* 1. Create a new UDP control block  */
+   //Secondly create a new UDP control block
    upcb = udp_new();
 
-   /* 2. Bind the upcb to the local port */
+   //Secondly bind the upcb to the local port
    ip_addr_t myIPADDR;
    IP_ADDR4(&myIPADDR, 192, 168, 0, 123);
 
    err = udp_bind(upcb, &myIPADDR, 7);  // 7 is the server UDP port
 
 
-   /* 3. Set a receive callback for the upcb */
+   //Thirdly set a receive callback for the upcb
    if(err == ERR_OK)
    {
 	   udp_recv(upcb, udp_receive_callback, NULL);
@@ -164,7 +163,7 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 {
 	struct pbuf *txBuf;
 
-	/* Get the IP of the Client */
+	//Get IP of the client
 	char *remoteIP = ipaddr_ntoa(addr);
 
 	char buf[100];
@@ -172,25 +171,25 @@ void udp_receive_callback(void *arg, struct udp_pcb *upcb, struct pbuf *p, const
 
 	int len = sprintf (buf,"Hello %s From UDP SERVER\n", (char*)p->payload);
 
-	/* allocate pbuf from RAM*/
+	//Allocate packet buffer (pbuff) from RAM
 	txBuf = pbuf_alloc(PBUF_TRANSPORT,len, PBUF_RAM);
 
-	/* copy the data into the buffer  */
+	//Copy the data into buffer
 	pbuf_take(txBuf, buf, len);
 
-	/* Connect to the remote client */
+	//Connect to the remote client
 	udp_connect(upcb, addr, port);
 
-	/* Send a Reply to the Client */
+	//Send a reply to the client
 	udp_send(upcb, txBuf);
 
-	/* free the UDP connection, so we can accept new clients */
+	//Free UDP connection to serve new clients
 	udp_disconnect(upcb);
 
-	/* Free the p_tx buffer */
+	//Free the p_tx buffer
 	pbuf_free(txBuf);
 
-	/* Free the p buffer */
+	//Free the p buffer
 	pbuf_free(p);
 }
 
